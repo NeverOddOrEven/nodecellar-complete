@@ -1,15 +1,20 @@
-var mongo = require('mongodb');
+var mongo = require('mongodb'), url = require('url');
 
 var mongoUri = process.env.MONGOLAB_URI ||
    process.env.MONGOHQ_URL ||
-   'mongodb://localhost/mydb';
+   'localhost';
+
+console.log("MongoUri: " + mongoUri);
 
 var Server = mongo.Server,
     Db = mongo.Db,
     BSON = mongo.BSONPure;
 
 var parsedUrl = url.parse(mongoUri);
-var server = new Server(mongoUri, parsedUrl.port, {auto_reconnect: true});
+
+var port = parsedUrl.port || 27017;
+
+var server = new Server(mongoUri, port, {auto_reconnect: true});
 
 db = new Db('winedb', server, {safe: true});
 
