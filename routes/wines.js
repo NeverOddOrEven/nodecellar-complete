@@ -1,10 +1,16 @@
 var mongo = require('mongodb');
 
+var mongoUri = process.env.MONGOLAB_URI ||
+   process.env.MONGOHQ_URL ||
+   'mongodb://localhost/mydb';
+
 var Server = mongo.Server,
     Db = mongo.Db,
     BSON = mongo.BSONPure;
 
-var server = new Server('alex:testpass@ds037067.mongolab.com:37067/heroku_app23604047', 37067, {auto_reconnect: true});
+var parsedUrl = url.parse(mongoUri);
+var server = new Server(mongoUri, parsedUrl.port, {auto_reconnect: true});
+
 db = new Db('winedb', server, {safe: true});
 
 db.open(function(err, db) {
@@ -16,6 +22,8 @@ db.open(function(err, db) {
                 populateDB();
             }
         });
+    } else {
+    	console.log("Could not connect to the database");
     }
 });
 
