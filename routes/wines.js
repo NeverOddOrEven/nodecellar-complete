@@ -14,6 +14,8 @@ var parsedUrl = url.parse(mongoUri);
 
 var port = parsedUrl.port || 27017;
 
+console.log("Port: " + port);
+
 var server = new Server(mongoUri, port, {auto_reconnect: true});
 
 db = new Db('winedb', server, {safe: true});
@@ -28,7 +30,7 @@ db.open(function(err, db) {
             }
         });
     } else {
-    	console.log("Could not connect to the database");
+    	console.log("Could not connect to the database." + err);
     }
 });
 
