@@ -1,9 +1,10 @@
 var mongo = require('mongodb'), url = require('url');
 
-var mongoUri = //process.env.MONGOLAB_URI ||
+var mongoUri = process.env.MONGOLAB_URI ||
    process.env.MONGOHQ_URL ||
-   'localhost';
+   'mongodb://localhost';
 
+mongoUri = mongoUri;
 console.log("MongoUri: " + mongoUri);
 
 var Server = mongo.Server,
@@ -16,27 +17,28 @@ var port = parsedUrl.port || 27017;
 
 console.log("Port: " + port);
 
-var server = new Server(mongoUri, port, {auto_reconnect: true});
+mongo.MongoClient.connect(mongoUri, { server: {auto_reconnect: true} }, function(err, arg_db) {
+	db = arg_db;
+	if(!err) {
+		console.log("New method connected to the DB just fine.");	
+		db.collection('wines', {safe:true}, function(err, collection) {
+        	if (err) {
+                	console.log("The 'wines' collection doesn't exist. Creating it with sample data...");
+                	populateDB();
+            	}
 
-db = new Db('winedb', server, {safe: true});
+	});
 
-db.open(function(err, db) {
-    if(!err) {
-        console.log("Connected to 'winedb' database");
-        db.collection('wines', {safe:true}, function(err, collection) {
-            if (err) {
-                console.log("The 'wines' collection doesn't exist. Creating it with sample data...");
-                populateDB();
-            }
-        });
-    } else {
-    	console.log("Could not connect to the database." + err);
-    }
+	} else {
+		console.log("Error connecting to the DB using new method");
+	}
 });
+
 
 exports.findById = function(req, res) {
     var id = req.params.id;
     console.log('Retrieving wine: ' + id);
+
     db.collection('wines', function(err, collection) {
         collection.findOne({'_id':new BSON.ObjectID(id)}, function(err, item) {
             res.send(item);
@@ -45,9 +47,12 @@ exports.findById = function(req, res) {
 };
 
 exports.findAll = function(req, res) {
+    console.log("Find all");
+
     db.collection('wines', function(err, collection) {
         collection.find().toArray(function(err, items) {
             res.send(items);
+ 	    console.log(items);
         });
     });
 };
