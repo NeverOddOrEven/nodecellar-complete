@@ -1,6 +1,6 @@
 var mongo = require('mongodb'), url = require('url');
 
-var mongoUri = process.env.MONGOLAB_URI ||
+var mongoUri = //process.env.MONGOLAB_URI ||
    process.env.MONGOHQ_URL ||
    'localhost';
 
